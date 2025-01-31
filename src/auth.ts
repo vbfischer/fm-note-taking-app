@@ -1,37 +1,55 @@
-import { CognitoIdentityProviderClient, InitiateAuthCommand, InitiateAuthCommandInput } from "@aws-sdk/client-cognito-identity-provider";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 
-const cognitoClient = new CognitoIdentityProviderClient({
-    region: "us-east-1",
-})
+//const cognitoClient = new CognitoIdentityProviderClient({
+//    region: "us-east-1",
+//})
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-    providers: [Credentials({
-        credentials: {
-            email: {},
-            password: {}
-        },
+    callbacks: {
+        authorized({ auth, request: { nextUrl } }) {
+            const isLoggedIn = !!auth?.user;
+            const isOnHomePage = nextUrl.pathname === "/notes"
 
-        authorize: async (credentials) => {
-            const params: InitiateAuthCommandInput = {
-                AuthFlow: "USER_PASSWORD_AUTH",
-                ClientId: process.env.AUTH_COGNITO_ID,
-                AuthParameters: {
-                    USERNAME: credentials.email?.toString() ?? "",
-                    PASSWORD: credentials.password?.toString() ?? "",
-                }
+            if (isOnHomePage) {
+                if (isLoggedIn) return true;
+                return false; // Redirect unauthenticated users to login page
+            } else if (isLoggedIn) {
+                return Response.redirect(new URL('/notes', nextUrl));
             }
 
-            const command = new InitiateAuthCommand(params);
-
-            const { AuthenticationResult } = await cognitoClient.send(command);
-
-            console.log('AuthResult', AuthenticationResult)
-
-            return {};
+            return true;
         }
-    })],
+    },
+    providers: [
+        Credentials({
+            authorize: async (credentials) => {
+                if (credentials.password !== "password") {
+                    return null
+                }
+
+                return {
+                    id: "Test",
+                    name: "Test User",
+                    email: credentials.email?.toString()
+                }
+            }
+        }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+
+            authorization: {
+                params: {
+                    prompt: 'consent',
+                    access_type: "offline",
+                    response_type: "code"
+                }
+            }
+        }),
+
+    ],
     pages: {
         signIn: "/signin",
     },

@@ -1,0 +1,11 @@
+{
+    typescript: true,
+    ref: true,
+    titleProp: true,
+    replaceAttrValues: {
+        "#0E121B": "currentColor"
+    },
+    outDir: "./src/ui/icons/",
+    index: true
+
+}
