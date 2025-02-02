@@ -1,10 +1,11 @@
 import React from 'react';
-import { Button, Text } from "./components"
+import { Button, Separator, Text } from "./components"
 import clsx from 'clsx';
 import { getAllNotes } from '@/app/lib/data';
 import { auth } from '@/auth';
 import { IconPlus } from './icons';
 import { CreateLink } from './components/CreateLink';
+import { NoteListItem } from './components/NoteListItem';
 
 export interface NotesListProps extends React.ComponentPropsWithoutRef<"div"> {
     searchTerm?: string;
@@ -26,14 +27,15 @@ export const NotesList = async ({ className, ...props }: NotesListProps) => {
                 </div>
                 {notes.length === 0 && (
                     <div className="p-100 rounded-8 border-1 border-neutral-200 bg-neutral-100">
-                        <Text >You don&apos;t have any notes yet. Start a new note to capture your thoughts and ideas.</Text>
+                        <Text>You don&apos;t have any notes yet. Start a new note to capture your thoughts and ideas.</Text>
                     </div>
                 )}
                 {notes.length !== 0 && (
                     notes.map(n => (
-                        <div key={n.id}>
-                            <Text>{n.title}</Text>
-                        </div>
+                        <>
+                            <NoteListItem key={n.id} title={n.title} lastUpdatedOn={n.lastUpdatedOn} tags={n.noteTags.map(nt => nt.tag.name)} />
+                            <Separator />
+                        </>
                     ))
                 )}
             </div>

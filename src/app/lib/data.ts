@@ -4,33 +4,53 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { genSaltSync, hashSync } from 'bcrypt-ts';
 
-import { notes, notesToTags, tags, users, UserType } from "../db/schema";
+import * as schema from '../db/schema'
+import { notes, notesToTags, tags, users } from "../db/schema";
 
 // ╓─────────────────────────────────────────────────────────╖
 // ║             Instantiate the Drizzle client              ║
 // ╙─────────────────────────────────────────────────────────╜
 
 const client = postgres(`${process.env.POSTGRES_URL!}?sslmode=require`);
-export const db = drizzle(client);
+export const db = drizzle(client, { schema, logger: true });
 
 // ╓─────────────────────────────────────────────────────────╖
 // ║                  Basic CRUD operations                  ║
 // ╙─────────────────────────────────────────────────────────╜
 
-export const getUser = async (email: string): Promise<UserType[]> => {
-    return await db.select().from(users).where(eq(users.email, email)) as UserType[];
+export const getUser = async (email: string) => {
+    return await db.query.users.findFirst({
+        where: eq(users.email, email)
+    })
 }
 
 export const getTag = async (tagName: string, userId: string) => {
-    return await db.select().from(tags).where(and(eq(tags.name, tagName), eq(tags.authorId, userId)));
+    return await db.query.tags.findFirst({
+        where: and(eq(tags.name, tagName), eq(tags.authorId, userId))
+    })
 }
 
 export const getAllTags = async (userId: string) => {
-    return await db.select().from(tags).where(eq(tags.authorId, userId));
+    return await db.query.tags.findMany({
+        where: eq(tags.authorId, userId)
+    })
 }
 
 export const getAllNotes = async (userId: string) => {
-    return await db.select().from(notes).where(eq(notes.authorId, userId))
+    return await db.query.notes.findMany({
+        where: eq(notes.authorId, userId),
+        with: {
+            noteTags: {
+                with: {
+                    tag: {
+                        columns: {
+                            name: true
+                        }
+                    }
+                }
+            }
+        }
+    })
 }
 
 export const createUser = async (email: string, password: string) => {
@@ -43,8 +63,8 @@ export const createUser = async (email: string, password: string) => {
 export const createTag = async (tagName: string, userId: string) => {
     const tag = await getTag(tagName, userId)
 
-    if (tag.length !== 0) {
-        return { tagId: tag[0].id }
+    if (tag) {
+        return { tagId: tag.id }
     }
 
     return await db.insert(tags).values({ name: tagName, authorId: userId }).returning({ tagId: tags.id });
@@ -60,5 +80,5 @@ export const createNote = async (title: string, noteTags: string, content: strin
 
     const newTags = flatten(await Promise.all(tagEntries.map(t => createTag(t.name, userId))));
 
-    await Promise.all(newTags.map(t => db.insert(notesToTags).values({ noteId: newNote.noteId, tagId: t.tagId })))
+    await Promise.all(newTags.map(t => db.insert(notesToTags).values({ noteId: newNote.noteId, tagId: t.tagId, authorId: userId })))
 }
