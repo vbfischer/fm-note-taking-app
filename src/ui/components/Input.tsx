@@ -34,7 +34,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className
                 )
             }>
                 {contentLeft && (<div>{contentLeft}</div>)}
-                <input ref={ref} className={clsx("dark:bg-neutral-950 focus-visible:outline-none group-hover:bg-neutral-50 dark:group-hover:bg-neutral-950 dark:text-neutral-0 disabled:bg-neutral-50")} {...props} />
+                <input ref={ref} className={clsx("flex-1 dark:bg-neutral-950 focus-visible:outline-none group-hover:bg-neutral-50 dark:group-hover:bg-neutral-950 dark:text-neutral-0 disabled:bg-neutral-50")} {...props} />
                 {contentRight && (<div>{contentRight}</div>)}
 
             </div>

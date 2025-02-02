@@ -13,7 +13,8 @@ const buttonVariants = cva(
                 default: "",
                 primary: "bg-blue-500 text-neutral-0 hover:bg-blue-700 ",
                 secondary: "bg-neutral-100 color-neutral-600 hover:bg-neutral-0 border-1 border-neutral-0 hover:shadow-[0_1px_2px_0_rgba(10,13,20,0.003)] hover:border-1 hover:border-neutral-300 focus:border-1 focus:border-neutral-950 focus:bg-neutral-0",
-                border: "bg-neutral-0 border-1 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-0 focus:border-neutral-950 focus:bg-neutral-0 disabled:border-neutral-0"
+                border: "bg-neutral-0 border-1 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-0 focus:border-neutral-950 focus:bg-neutral-0 disabled:border-neutral-0",
+                link: "px-0 py-0"
             }
         },
         defaultVariants: {

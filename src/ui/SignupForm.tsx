@@ -36,7 +36,7 @@ export const SignupForm = () => {
 
             <Button variant="border" type="submit" name="action" value="google" aria-disabled={isPending}><IconGoogle />Google</Button>
             <Separator />
-            <Text centered variant="secondary" size="sm">No account yet? <Link href="signIn" className="text-neutral-950">Sign Up</Link></Text>
+            <Text centered variant="secondary" size="sm">Already have an account?<Link href="signin" className="text-neutral-950">Sign In</Link></Text>
             <div className="flex h-8 items-end space-x-1">
                 {errorMessage && (
                     <>

@@ -1,7 +1,9 @@
 'use server'
 
-import { signIn, signOut } from "@/auth"
+import { auth, signIn, signOut } from "@/auth"
 import { AuthError } from "next-auth";
+import { createNote, createUser, getUser } from "../lib/data";
+import { redirect } from "next/navigation";
 
 export const logInAction = async (_prevSate: string | undefined, formData: FormData) => {
     const action = formData.get("action") as string;
@@ -38,9 +40,17 @@ export const doLogout = async () => {
 }
 
 export const signupAction = async (_prevSate: string | undefined, formData: FormData) => {
-
     try {
-        console.log('formData', formData)
+        const email = formData.get('email') as string;
+        const password = formData.get('password') as string;
+
+        const user = await getUser(email)
+        if (user.length > 0) {
+            return "User already exists"
+        } else {
+            await createUser(email, password)
+            redirect('/signin')
+        }
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
@@ -52,4 +62,17 @@ export const signupAction = async (_prevSate: string | undefined, formData: Form
         }
         throw error;
     }
+}
+
+export const saveNote = async (formData: FormData) => {
+    const session = await auth();
+    const user = session?.user;
+    const userId = user?.id;
+
+    const title = formData.get("title") as string;
+    const content = formData.get("content") as string;
+    const tags = formData.get("tags") as string;
+
+    const response = await createNote(title, tags, content, userId ?? "")
+    console.log('response', response)
 }

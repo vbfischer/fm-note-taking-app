@@ -1,13 +1,26 @@
-import NextAuth from "next-auth";
+import NextAuth, { User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { getUser } from "./app/lib/data";
+import { compare } from "bcrypt-ts";
 
 //const cognitoClient = new CognitoIdentityProviderClient({
 //    region: "us-east-1",
 //})
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+    session: {
+        strategy: "jwt",
+    },
     callbacks: {
+        session: ({ session, token }) => ({
+            ...session,
+            user: {
+                ...session.user,
+                id: token.sub
+            }
+        }),
+
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             const isOnHomePage = nextUrl.pathname === "/notes"
@@ -24,17 +37,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     providers: [
         Credentials({
-            authorize: async (credentials) => {
-                if (credentials.password !== "password") {
-                    return null
-                }
+            credentials: {
+                email: {},
+                password: {},
+            },
+            authorize: async ({ email, password }: Partial<Record<"email" | "password", unknown>>) => {
+                const user = await getUser(email as string);
+                if (user.length === 0) return null;
+
+                const passwordsMatch = await compare(password as string, user[0].password!);
+                if (!passwordsMatch) return null
 
                 return {
-                    id: "Test",
-                    name: "Test User",
-                    email: credentials.email?.toString()
-                }
+                    id: user[0].id.toString(),
+                    email: user[0].email,
+                } as User;
             }
+            //authorize: async ({ email, password }: { email: string, password: string }) => {
+            //    const user = await getUser(email);
+            //    if (user.length === 0) return null;
+            //    const passwordsMatch = await compare(password, user[0].password!);
+            //    if (passwordsMatch) return user[0];
+            //
+            //}
         }),
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,

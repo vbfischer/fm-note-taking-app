@@ -1,5 +1,5 @@
 import { AuthHeader } from "@/ui/AuthHeader"
-import LoginForm from "@/ui/LoginForm"
+import { SignupForm } from "@/ui/SignupForm"
 import { Suspense } from "react"
 
 const SignupPage = () => {
@@ -7,10 +7,9 @@ const SignupPage = () => {
         <>
             <AuthHeader title="Create Your Account" subtitle="Sign up to start organizing your notes and boost your productiviy." />
             <Suspense>
-                <LoginForm />
+                <SignupForm />
             </Suspense>
         </>
-
     )
 }
 
