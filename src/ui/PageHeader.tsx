@@ -1,12 +1,30 @@
 import React from 'react';
-
-import { Logo } from "./icons"
 import clsx from 'clsx';
 
-export const PageHeader = ({ className, ...props }: React.ComponentPropsWithoutRef<"div">) => {
+import { Input, Text } from './components';
+import { IconSearch, IconSettings } from './icons';
+
+export interface PageHeaderProps extends React.ComponentPropsWithoutRef<"div"> {
+    title: string;
+}
+
+export const PageHeader = ({ title, className, ...props }: PageHeaderProps) => {
     return (
-        <div className={clsx("px-200 py-150", className)} {...props}>
-            <Logo />
+        <div data-attribute-notepage className={
+            clsx(
+                "hidden desktop:px-400",
+                "desktop:flex desktop:col-start-full desktop:row-start-1 h-[81px] items-center",
+                "justify-between",
+                "border-b-1 border-neutral-200",
+                className
+            )
+        } {...props}>
+            <Text size="xl" weight="bold">{title}</Text>
+            <div className="flex gap-200">
+                <Input className="w-[300px]" contentLeft={<IconSearch />} placeholder="Search by title, content or tags..." />
+                <button><IconSettings /></button>
+            </div>
         </div>
+
     )
 }

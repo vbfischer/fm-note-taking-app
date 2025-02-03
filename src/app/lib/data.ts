@@ -32,13 +32,14 @@ export const getTag = async (tagName: string, userId: string) => {
 
 export const getAllTags = async (userId: string) => {
     return await db.query.tags.findMany({
-        where: eq(tags.authorId, userId)
+        where: eq(tags.authorId, userId),
+        orderBy: tags.name
     })
 }
 
 export const getAllNotes = async (userId: string) => {
     return await db.query.notes.findMany({
-        where: eq(notes.authorId, userId),
+        where: and(eq(notes.authorId, userId), eq(notes.archived, false)),
         with: {
             noteTags: {
                 with: {

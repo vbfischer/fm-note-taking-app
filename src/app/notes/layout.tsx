@@ -1,5 +1,6 @@
-import { MenuBar } from "@/ui/MenuBar"
+import { MobilePageHeader } from "@/ui/MobilePageHeader"
 import { Navigation } from "@/ui/Navigation"
+import { NotesList } from "@/ui/NotesList"
 import { PageHeader } from "@/ui/PageHeader"
 import clsx from "clsx"
 
@@ -9,18 +10,15 @@ const NotesLayout = ({ children }: { children: React.ReactNode }) => {
             clsx(
                 "bg-neutral-0 h-screen",
                 "grid grid-rows-[max-content_1fr_max-content]",
-                "desktop:grid-cols-[auto_1fr]"
+                "desktop:grid-cols-[240px_290px_1fr]"
             )
         }>
-            <PageHeader className="desktop:hidden" />
-            <Navigation className="hidden desktop:flex desktop:col-start-1 desktop:row-span-full w-[240px]" />
+            <MobilePageHeader className="desktop:hidden" />
+            <Navigation className="hidden desktop:flex desktop:col-start-1 desktop:row-span-full" />
+            <PageHeader title="All Notes" className="row-start-1 col-start-2 col-span-2" />
 
-            <PageHeader className="hidden desktop:col-start-1 desktop:row-start-1" />
-            <div className="px-200 py-250 flex flex-col">
-
-                {children}
-            </div>
-            <MenuBar className="flex desktop:hidden" />
+            <NotesList className={clsx("row-start-2 border-r-1 border-neutral-200 hidden desktop:flex")} />
+            {children}
         </div>
     )
 }

@@ -2,11 +2,18 @@
 import React from 'react';
 import { IconArchive, IconHome, IconTag } from './icons';
 import clsx from 'clsx';
-import { PageHeader } from './PageHeader';
 import { NavItem } from './components/NavItem';
 import { Separator, Text } from './components';
+import { NoteLogo } from './NoteLogo';
+import { getAllTags } from '@/app/lib/data';
+import { auth } from '@/auth';
 
-export const Navigation = ({ className, ...props }: React.ComponentPropsWithoutRef<"div">) => {
+export const Navigation = async ({ className, ...props }: React.ComponentPropsWithoutRef<"div">) => {
+    const session = await auth();
+    const userId = session?.user?.id
+
+    const tags = await getAllTags(userId!);
+
     return (
         <div className={
             clsx(
@@ -15,13 +22,16 @@ export const Navigation = ({ className, ...props }: React.ComponentPropsWithoutR
                 className
             )
         } {...props}>
-            <PageHeader />
+            <NoteLogo />
             <div className="flex flex-col">
                 <NavItem selected><IconHome /> All Notes</NavItem>
                 <NavItem><IconArchive /> Archived Notes</NavItem>
                 <Separator className="my-[8px]" />
                 <Text className="text-neutral-500 my-[8px]">Tags</Text>
-                <NavItem><IconTag />Cooking</NavItem>
+                {tags.map(t => (
+                    <NavItem key={t.id}><IconTag />{t.name}</NavItem>
+
+                ))}
             </div>
         </div>
     )

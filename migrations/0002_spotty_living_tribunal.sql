@@ -1,0 +1,1 @@
+ALTER TABLE "Note" ADD COLUMN "archived" boolean DEFAULT false NOT NULL;

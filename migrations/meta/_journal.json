@@ -15,6 +15,13 @@
       "when": 1738515542606,
       "tag": "0001_shallow_princess_powerful",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1738525939688,
+      "tag": "0002_spotty_living_tribunal",
+      "breakpoints": true
     }
   ]
 }

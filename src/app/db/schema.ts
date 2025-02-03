@@ -1,5 +1,5 @@
 import { InferSelectModel, relations } from "drizzle-orm";
-import { pgTable, primaryKey, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { pgTable, primaryKey, text, timestamp, varchar, boolean } from "drizzle-orm/pg-core";
 
 export const users = pgTable("User", {
     id: text("id")
@@ -24,6 +24,7 @@ export const notes = pgTable("Note", {
     title: varchar('title', { length: 64 }).notNull(),
     content: text("content").notNull(),
     authorId: text('author_id').notNull(),
+    archived: boolean('archived').notNull().default(false),
     lastUpdatedOn: timestamp('last_updated_on').notNull().defaultNow()
 })
 

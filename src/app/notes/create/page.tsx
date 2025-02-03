@@ -15,8 +15,8 @@ const CreateNotePage = () => {
 
 
     return (
-        <form action={formAction} className="flex flex-col gap-150 h-full">
-            <div className="flex items-center justify-between pb-150 border-b-1 border-neutral-200">
+        <form action={formAction} className={clsx("flex flex-col gap-150 h-full py-250 px-200 tablet:px-400 desktop:px-300")}>
+            <div className="flex items-center justify-between pb-150 border-b-1 border-neutral-200 desktop:hidden">
                 <Link href="/notes" aria-disabled={isPending} className="flex gap-050 text-neutral-600"><IconArrowLeft />Go Back</Link>
                 <div className="flex gap-200">
                     <Button variant="link" disabled={isPending}>Cancel</Button>

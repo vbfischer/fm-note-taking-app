@@ -10,6 +10,7 @@ export const CreateLink = ({ className, href = "/", ...props }: React.ComponentP
                 clsx(
                     "absolute rounded-full w-[48px] h-[48px] py-0 px-0 right-[35px] bottom-[80px]",
                     "flex bg-blue-500 text-neutral-0 items-center justify-center",
+                    "desktop:static desktop:flex desktop:w-auto desktop:py-150 desktop:px-200 desktop:rounded-8",
                     className
                 )
             } {...props} />
