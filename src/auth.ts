@@ -8,6 +8,12 @@ import { compare } from "bcrypt-ts";
 //    region: "us-east-1",
 //})
 
+declare module "next-auth" {
+    interface Session {
+        userId?: string
+    }
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
     session: {
         strategy: "jwt",

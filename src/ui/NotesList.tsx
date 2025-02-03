@@ -40,16 +40,18 @@ export const NotesList = async ({ className, ...props }: NotesListProps) => {
                         <Text>You don&apos;t have any notes yet. Start a new note to capture your thoughts and ideas.</Text>
                     </div>
                 )}
-                {notes.length !== 0 && (
-                    notes.map(n => (
-                        <React.Fragment key={n.id}>
-                            <Link href={`/notes/${n.id}`}>
-                                <NoteListItem title={n.title} lastUpdatedOn={n.lastUpdatedOn} tags={n.noteTags.map(nt => nt.tag.name)} />
-                            </Link>
-                            <Separator />
-                        </React.Fragment>
-                    ))
-                )}
+                <div>
+                    {notes.length !== 0 && (
+                        notes.map(n => (
+                            <React.Fragment key={n.id}>
+                                <Link href={`/notes/${n.id}`}>
+                                    <NoteListItem noteId={n.id} title={n.title} lastUpdatedOn={n.lastUpdatedOn} tags={n.noteTags.map(nt => nt.tag.name)} />
+                                </Link>
+                                <Separator />
+                            </React.Fragment>
+                        ))
+                    )}
+                </div>
             </div>
             <CreateLink href="/notes/create" className="absolute right-[35px] bottom-[80px] desktop:hidden">
                 <IconPlus className="fill-neutral-0" />

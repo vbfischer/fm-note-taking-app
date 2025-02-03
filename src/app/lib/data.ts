@@ -53,6 +53,23 @@ export const getAllNotes = async (userId: string) => {
     })
 }
 
+export const getNote = async (userId: string, noteId: string) => {
+    return await db.query.notes.findFirst({
+        where: and(eq(notes.authorId, userId), eq(notes.id, noteId)),
+        with: {
+            noteTags: {
+                with: {
+                    tag: {
+                        columns: {
+                            name: true
+                        }
+                    }
+                }
+            }
+        }
+    })
+}
+
 export const createUser = async (email: string, password: string) => {
     const salt = genSaltSync(10);
     const hash = hashSync(password, salt);
@@ -81,4 +98,29 @@ export const createNote = async (title: string, noteTags: string, content: strin
     const newTags = (await Promise.all(tagEntries.map(t => createTag(t.name, userId)))).flat();
 
     await Promise.all(newTags.map(t => db.insert(notesToTags).values({ noteId: newNote.noteId, tagId: t.tagId, authorId: userId })))
+}
+
+export const updateNote = async (noteId: string, title: string, tags: string, content: string, userId: string) => {
+    const updatedNote = (await db.update(notes).set({
+        title,
+        content
+    }).where(eq(notes.id, noteId)).returning({ noteId: notes.id }))[0]
+
+    await db.delete(notesToTags).where(eq(notesToTags.noteId, noteId));
+
+    const tagEntries = tags.split(',').map(t => ({
+        name: t.trim(),
+        authorId: userId
+    }))
+
+    const newTags = (await Promise.all(tagEntries.map(t => createTag(t.name, userId)))).flat();
+    await Promise.all(newTags.map(t => db.insert(notesToTags).values({ noteId: updatedNote.noteId, tagId: t.tagId, authorId: userId })))
+
+    return updatedNote
+}
+
+export const archiveNote = async (noteId: string, userId: string) => {
+    await db.update(notes).set({
+        archived: true
+    }).where(and(eq(notes.id, noteId), eq(notes.authorId, userId)));
 }

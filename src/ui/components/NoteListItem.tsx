@@ -1,17 +1,29 @@
+'use client'
+
 import React from 'react';
 import { Text } from '@/ui/components'
 import clsx from 'clsx';
 import { format } from 'date-fns';
+import { useParams } from 'next/navigation';
 
 export interface NoteListItemProps extends React.ComponentPropsWithoutRef<"div"> {
     title: string;
     tags: string[];
-    lastUpdatedOn: Date
+    lastUpdatedOn: Date;
+    noteId: string
 }
 
-export const NoteListItem = ({ className, title, tags, lastUpdatedOn }: NoteListItemProps) => {
+export const NoteListItem = ({ noteId: noteIdProp, className, title, tags, lastUpdatedOn }: NoteListItemProps) => {
+    const { noteId } = useParams();
+
     return (
-        <div className={clsx("flex flex-col gap-150 cursor-pointer", className)}>
+        <div className={clsx(
+            "flex flex-col gap-150 cursor-pointer p-100",
+            {
+                'bg-neutral-100': noteId === noteIdProp
+            },
+            className
+        )}>
             <Text size="xl" weight="bold">{title}</Text>
             <div className="flex gap-100">
                 {tags.map(t => (

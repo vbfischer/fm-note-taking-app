@@ -2,10 +2,12 @@
 
 import { auth, signIn, signOut } from "@/auth"
 import { AuthError } from "next-auth";
-import { createNote, createUser, getUser } from "../lib/data";
+import { createNote, createUser, db, getUser, updateNote } from "../lib/data";
 import { redirect } from "next/navigation";
 import { z } from 'zod'
 import { revalidatePath } from "next/cache";
+import { and, eq } from "drizzle-orm";
+import { notes } from "../db/schema";
 
 
 export type CreateNoteActionType = {
@@ -22,7 +24,7 @@ export type SignupActionType = {
 export type State = {
     errors?: Record<string, string[]>;
     message?: string | null;
-    formData?: FormData
+    formData?: Record<string, unknown>
 };
 
 //export type State<T extends Record<string, string>> = {
@@ -103,9 +105,13 @@ const NoteSchema = z.object({
 })
 
 
-export const saveNote = async (prevState: State, formData: FormData): Promise<State> => {
+export const saveNote = async (_prevState: State, formData: FormData): Promise<State> => {
     const session = await auth();
     const user = session?.user;
+
+    const noteId = formData.get('noteId') as string;
+
+    const isEditing = !!noteId;
 
     const validatedFields = NoteSchema.safeParse({
         title: formData.get('title'),
@@ -119,18 +125,44 @@ export const saveNote = async (prevState: State, formData: FormData): Promise<St
         return {
             errors: validatedFields.error.flatten().fieldErrors,
             message: 'Missing Fields. ',
-            formData
+            formData: {
+                title: formData.get('title'),
+                content: formData.get('content'),
+                tags: formData.get('tags'),
+                lastEdited: formData.get('lastEdited')
+
+            }
         };
     }
 
     const { title, content, tags, userId } = validatedFields.data;
 
     try {
-        await createNote(title, tags, content, userId ?? "")
-        revalidatePath('/notes');
-        redirect('/notes');
+        if (isEditing) {
+            await updateNote(noteId, title, tags, content, userId)
+            redirect(`/notes/${noteId}`);
+        } else {
+            await createNote(title, tags, content, userId ?? "")
+            revalidatePath('/notes');
+            redirect('/notes');
+        }
 
     } catch (error) {
         throw error
     }
+}
+
+export const archiveNote = async (noteId: string) => {
+    const session = await auth();
+
+    if (!session || !session.userId) {
+        throw Error("Unauthorized")
+    }
+
+    await db.update(notes).set({
+        archived: true
+    }).where(and(eq(notes.id, noteId), eq(notes.authorId, session.userId)));
+
+    revalidatePath(`/notes`);
+    redirect(`/notes`)
 }
