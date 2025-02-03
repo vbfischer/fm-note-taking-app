@@ -18,7 +18,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             user: {
                 ...session.user,
                 id: token.sub
-            }
+            },
+            userId: token.sub
         }),
 
         authorized({ auth, request: { nextUrl } }) {
@@ -43,23 +44,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
             authorize: async ({ email, password }: Partial<Record<"email" | "password", unknown>>) => {
                 const user = await getUser(email as string);
-                if (user.length === 0) return null;
+                if (!user) return null;
 
-                const passwordsMatch = await compare(password as string, user[0].password!);
+                const passwordsMatch = await compare(password as string, user.password!);
                 if (!passwordsMatch) return null
 
                 return {
-                    id: user[0].id.toString(),
-                    email: user[0].email,
+                    id: user.id.toString(),
+                    email: user.email,
                 } as User;
             }
-            //authorize: async ({ email, password }: { email: string, password: string }) => {
-            //    const user = await getUser(email);
-            //    if (user.length === 0) return null;
-            //    const passwordsMatch = await compare(password, user[0].password!);
-            //    if (passwordsMatch) return user[0];
-            //
-            //}
         }),
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
