@@ -1,4 +1,3 @@
-import { flatten } from 'lodash'
 import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -79,7 +78,7 @@ export const createNote = async (title: string, noteTags: string, content: strin
         authorId: userId
     }))
 
-    const newTags = flatten(await Promise.all(tagEntries.map(t => createTag(t.name, userId))));
+    const newTags = (await Promise.all(tagEntries.map(t => createTag(t.name, userId)))).flat();
 
     await Promise.all(newTags.map(t => db.insert(notesToTags).values({ noteId: newNote.noteId, tagId: t.tagId, authorId: userId })))
 }

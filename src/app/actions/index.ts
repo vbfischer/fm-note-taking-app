@@ -7,14 +7,30 @@ import { redirect } from "next/navigation";
 import { z } from 'zod'
 import { revalidatePath } from "next/cache";
 
+
+export type CreateNoteActionType = {
+    title?: string;
+    tags?: string;
+    content?: string
+}
+
+export type SignupActionType = {
+    email?: string;
+    password?: string;
+}
+
 export type State = {
-    errors?: {
-        title?: string[];
-        content?: string[]
-    };
+    errors?: Record<string, string[]>;
     message?: string | null;
     formData?: FormData
 };
+
+//export type State<T extends Record<string, string>> = {
+//    errors?: T;
+//    message?: string | null;
+//    formData?: FormData
+//};
+
 
 export const logInAction = async (_prevSate: string | undefined, formData: FormData) => {
     const action = formData.get("action") as string;
@@ -50,14 +66,14 @@ export const doLogout = async () => {
     await signOut({ redirectTo: "/signin" })
 }
 
-export const signupAction = async (_prevSate: State, formData: FormData) => {
+export const signupAction = async (_prevSate: State, formData: FormData): Promise<State> => {
     try {
         const email = formData.get('email') as string;
         const password = formData.get('password') as string;
 
         const user = await getUser(email)
         if (user) {
-            return "User already exists"
+            return { message: "User already exists" }
         } else {
             await createUser(email, password)
             redirect('/signin')
@@ -66,9 +82,9 @@ export const signupAction = async (_prevSate: State, formData: FormData) => {
         if (error instanceof AuthError) {
             switch (error.type) {
                 case 'CredentialsSignin':
-                    return 'Invalid credentials.';
+                    return { message: 'Invalid credentials.' };
                 default:
-                    return 'Something went wrong.';
+                    return { message: 'Something went wrong.' };
             }
         }
         throw error;
@@ -87,7 +103,7 @@ const NoteSchema = z.object({
 })
 
 
-export const saveNote = async (prevState: State, formData: FormData) => {
+export const saveNote = async (prevState: State, formData: FormData): Promise<State> => {
     const session = await auth();
     const user = session?.user;
 

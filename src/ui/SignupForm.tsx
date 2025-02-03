@@ -1,5 +1,5 @@
 'use client'
-import { signupAction } from "@/app/actions";
+import { signupAction, State } from "@/app/actions";
 import clsx from "clsx";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -10,10 +10,14 @@ import { IconGoogle } from "./icons";
 export const SignupForm = () => {
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get('callbackUrl') || '/notes';
+    const defaultValues: State = {
+        message: null,
+        errors: {}
+    }
 
-    const [errorMessage, formAction, isPending] = useActionState(
+    const [actionState, formAction, isPending] = useActionState(
         signupAction,
-        undefined
+        defaultValues
     );
 
     return (
@@ -38,9 +42,9 @@ export const SignupForm = () => {
             <Separator />
             <Text centered variant="secondary" size="sm">Already have an account?<Link href="signin" className="text-neutral-950">Sign In</Link></Text>
             <div className="flex h-8 items-end space-x-1">
-                {errorMessage && (
+                {actionState.message && (
                     <>
-                        <p className="text-sm text-red-500">{errorMessage}</p>
+                        <p className="text-sm text-red-500">{actionState.message}</p>
                     </>
                 )}
             </div>
