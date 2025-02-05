@@ -1,9 +1,9 @@
-import { NoteForm } from "@/ui/NoteForm";
+import { CreateNoteForm } from "@/ui/CreateNoteForm";
 
 
 const CreateNotePage = async () => {
     return (
-        <NoteForm />
+        <CreateNoteForm />
     )
 }
 

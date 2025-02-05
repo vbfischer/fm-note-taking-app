@@ -1,39 +1,55 @@
 'use client'
 
-import { State, saveNote } from "@/app/actions";
+import React from 'react'
 import clsx from "clsx";
 import Link from "next/link";
 
 import { Button, Separator, Text } from "./components";
 import { IconArrowLeft, IconTag, IconClock } from "./icons";
+import { State } from "@/app/actions";
 import { useActionState } from "react";
+import { updateNotesAction } from "@/app/actions/notes-action";
 import { format } from "date-fns";
+import { useToast } from '@/hooks/use-toast';
 
-export interface NoteFormProps extends React.ComponentPropsWithoutRef<"form"> {
-    noteId?: string;
-    title?: string;
+export interface UpdateNoteFormProps extends React.ComponentPropsWithoutRef<"form"> {
+    noteId: string;
+    title: string;
     tags?: string;
-    content?: string;
-    lastEdited?: Date
+    content: string;
+    lastEdited: Date
 }
 
-export const NoteForm = ({ className, content, noteId, title, tags, lastEdited, ...props }: NoteFormProps) => {
-    const formattedDate = format(lastEdited!, "dd MMM yyyy");
+export const UpdateNoteForm = ({ className, noteId, title, tags, content, lastEdited, ...props }: UpdateNoteFormProps) => {
+    const { toast } = useToast()
     const initialState: State = {
-        message: null, errors: {}, formData: {
+        status: 'pending',
+        errors: {},
+        formData: {
             title,
             tags,
-            lastEdited: formattedDate,
             content
         }
     };
 
+    const updateNotesActionWithId = updateNotesAction.bind(null, noteId);
+
     const [state, formAction, isPending] =
-        useActionState(saveNote, initialState);
+        useActionState(updateNotesActionWithId, initialState);
+
+    console.log('############# STATE', state)
+    React.useEffect(() => {
+        if (state.status === "success" && !isPending) {
+            toast({
+                title: "Success",
+                description: "Very much a success"
+            })
+        }
+    }, [state.status, isPending, toast])
+
 
     return (
         <form action={formAction} className={clsx("flex flex-col gap-150 h-full py-250 px-200 tablet:px-400 desktop:px-300", className)} {...props}>
-            <input type="hidden" name="noteId" value={noteId} />
             <div className="flex items-center justify-between pb-150 border-b-1 border-neutral-200 desktop:hidden">
                 <Link href="/notes" aria-disabled={isPending} className="flex gap-050 text-neutral-600"><IconArrowLeft />Go Back</Link>
                 <div className="flex gap-200">
@@ -52,7 +68,7 @@ export const NoteForm = ({ className, content, noteId, title, tags, lastEdited, 
                 <Text><IconTag /> Tags</Text>
                 <textarea className="resize-none" defaultValue={state.formData?.tags as string} name="tags" placeholder="Add tags separated by commas (e.g. Work, Planning)" />
                 <Text ><IconClock /> Last edited</Text>
-                <input defaultValue={state.formData?.lastEdited as string} disabled name="lastEdited" placeholder="Not yet saved" />
+                <input defaultValue={format(lastEdited, "dd MMM yyyy")} disabled name="lastEdited" placeholder="Not yet saved" />
             </div>
             <Separator />
             <div className="flex flex-col flex-1">
@@ -71,4 +87,5 @@ export const NoteForm = ({ className, content, noteId, title, tags, lastEdited, 
     )
 
 }
+
 

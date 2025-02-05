@@ -11,7 +11,7 @@ import { notes, notesToTags, tags, users } from "../db/schema";
 // ╙─────────────────────────────────────────────────────────╜
 
 const client = postgres(`${process.env.POSTGRES_URL!}?sslmode=require`);
-export const db = drizzle(client, { schema, logger: true });
+export const db = drizzle(client, { schema, logger: false });
 
 // ╓─────────────────────────────────────────────────────────╖
 // ║                  Basic CRUD operations                  ║
@@ -98,6 +98,8 @@ export const createNote = async (title: string, noteTags: string, content: strin
     const newTags = (await Promise.all(tagEntries.map(t => createTag(t.name, userId)))).flat();
 
     await Promise.all(newTags.map(t => db.insert(notesToTags).values({ noteId: newNote.noteId, tagId: t.tagId, authorId: userId })))
+
+    return newNote.noteId;
 }
 
 export const updateNote = async (noteId: string, title: string, tags: string, content: string, userId: string) => {
@@ -116,7 +118,12 @@ export const updateNote = async (noteId: string, title: string, tags: string, co
     const newTags = (await Promise.all(tagEntries.map(t => createTag(t.name, userId)))).flat();
     await Promise.all(newTags.map(t => db.insert(notesToTags).values({ noteId: updatedNote.noteId, tagId: t.tagId, authorId: userId })))
 
-    return updatedNote
+    return updatedNote.noteId
+}
+
+export const deleteNote = async (noteId: string, userId: string) => {
+    const deletedNote = await db.delete(notes).where(and(eq(notes.id, noteId), eq(notes.authorId, userId))).returning({ noteId: notes.id });
+    return deletedNote[0].noteId;
 }
 
 export const archiveNote = async (noteId: string, userId: string) => {

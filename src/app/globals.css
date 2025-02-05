@@ -96,6 +96,29 @@
   --breakpoint-mobile: 375px;
   --breakpoint-tablet: 768px;
   --breakpoint-desktop: 1440px;
+
+  --animate-slideIn: slideIn 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-hide: hide 100ms ease-in;
+
+  @keyframes slideIn {
+    0% {
+        transform: translateX(calc(100% + var(--viewport-padding)))
+    }
+
+    to {
+        transform: "translateX(0)"
+    }
+  }
+
+  @keyframes hide {
+      0% {
+        opacity: 1
+      }
+
+      to {
+        opacity: 0
+      }
+  }
 }
 
 /*

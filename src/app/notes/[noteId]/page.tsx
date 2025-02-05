@@ -1,15 +1,18 @@
 import { getNote } from "@/app/lib/data";
 import { auth } from "@/auth";
 import { MenuSidebar } from "@/ui/MenuSidebar";
-import { NoteForm, NoteFormProps } from "@/ui/NoteForm";
+import { UpdateNoteForm, UpdateNoteFormProps } from "@/ui/UpdateNoteForm";
 
 const NotePage = async ({ params }: { params: Promise<{ noteId: string }> }) => {
     const noteId = (await params).noteId
     const userId = (await auth())?.userId;
 
     const noteData = await getNote(userId!, noteId);
+    if (!noteData) {
+        throw new Error("No Note Data")
+    }
 
-    const noteProps: NoteFormProps = {
+    const noteProps: UpdateNoteFormProps = {
         noteId: noteData?.id,
         title: noteData?.title,
         content: noteData?.content,
@@ -19,7 +22,7 @@ const NotePage = async ({ params }: { params: Promise<{ noteId: string }> }) => 
 
     return (
         <div className="flex">
-            <NoteForm className="flex-1" {...noteProps} />
+            <UpdateNoteForm className="flex-1" {...noteProps} />
             <MenuSidebar className="hidden desktop:flex" archived={false} />
         </div>
     )

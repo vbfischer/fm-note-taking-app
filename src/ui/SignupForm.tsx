@@ -11,7 +11,7 @@ export const SignupForm = () => {
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get('callbackUrl') || '/notes';
     const defaultValues: State = {
-        message: null,
+        status: "pending",
         errors: {}
     }
 
