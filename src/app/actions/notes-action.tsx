@@ -5,9 +5,7 @@ import { createNote, db, deleteNote, updateNote } from "../lib/data";
 import { State } from ".";
 import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 import { notes } from "../db/schema";
-import { toast } from "@/hooks/use-toast";
 
 
 export const createNotesAction = async (_prevState: unknown, formData: FormData): Promise<State> => {

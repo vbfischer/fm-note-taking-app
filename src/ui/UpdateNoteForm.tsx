@@ -37,7 +37,6 @@ export const UpdateNoteForm = ({ className, noteId, title, tags, content, lastEd
     const [state, formAction, isPending] =
         useActionState(updateNotesActionWithId, initialState);
 
-    console.log('############# STATE', state)
     React.useEffect(() => {
         if (state.status === "success" && !isPending) {
             toast({

@@ -79,3 +79,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signIn: "/signin",
     },
 });
+
+export const getRequiredUserId = async () => {
+    const session = await auth();
+
+    const userId = session?.userId;
+
+    if (!userId) {
+        throw new Error('Unauthorized')
+    }
+
+    return userId
+}

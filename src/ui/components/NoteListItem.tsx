@@ -14,6 +14,7 @@ export interface NoteListItemProps extends React.ComponentPropsWithoutRef<"div">
 }
 
 export const NoteListItem = ({ noteId: noteIdProp, className, title, tags, lastUpdatedOn }: NoteListItemProps) => {
+    // Get the current selected noteId
     const { noteId } = useParams();
 
     return (

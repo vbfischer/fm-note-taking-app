@@ -24,9 +24,13 @@ export const MenuSidebar = ({ className, archived = false, ...props }: MenuSideb
             await archiveNoteAction(noteId as string)
 
             toast({
-                title: "Success",
+                title: "Archived Note",
+                action: (
+                    <ToastAction altText="all notes" asChild>
+                        <Link href="/notes/archived">Archived Notes</Link>
+                    </ToastAction>
+                )
             })
-
         })
     }
 
@@ -42,18 +46,6 @@ export const MenuSidebar = ({ className, archived = false, ...props }: MenuSideb
                         <IconArchive /> Archive Note
                     </Button>
                 )}
-                <Button variant="border" onClick={() => {
-                    toast({
-                        title: "Toast",
-                        action: (
-                            <ToastAction altText="all notes" asChild>
-                                <Link href="/notes">All Notes</Link>
-                            </ToastAction>
-                        )
-                    })
-                }}>
-                    show toast
-                </Button>
                 <Button variant="border">
                     <IconDelete /> Delete Note
                 </Button>

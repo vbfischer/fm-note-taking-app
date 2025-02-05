@@ -11,7 +11,7 @@ import { notes, notesToTags, tags, users } from "../db/schema";
 // ╙─────────────────────────────────────────────────────────╜
 
 const client = postgres(`${process.env.POSTGRES_URL!}?sslmode=require`);
-export const db = drizzle(client, { schema, logger: false });
+export const db = drizzle(client, { schema, logger: true });
 
 // ╓─────────────────────────────────────────────────────────╖
 // ║                  Basic CRUD operations                  ║
@@ -39,6 +39,25 @@ export const getAllTags = async (userId: string) => {
 export const getAllNotes = async (userId: string) => {
     return await db.query.notes.findMany({
         where: and(eq(notes.authorId, userId), eq(notes.archived, false)),
+        with: {
+            noteTags: {
+                with: {
+                    tag: {
+                        columns: {
+                            name: true
+                        }
+                    }
+                }
+            }
+        }
+    })
+}
+
+export type NoteResults = Awaited<ReturnType<typeof getAllNotes>>
+
+export const getArchivedNotes = async (userId: string) => {
+    return await db.query.notes.findMany({
+        where: and(eq(notes.authorId, userId), eq(notes.archived, true)),
         with: {
             noteTags: {
                 with: {

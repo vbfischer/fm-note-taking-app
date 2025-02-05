@@ -30,7 +30,7 @@ const toastVariants = cva(
         "grid grid-cols-[24px_1fr_max-content_auto] items-center gap-100 border-1 [grid-template-areas:_'title_action_close']",
         "rounded-8 p-100 w-[390px]",
         "shadow-[0px_16px_32px_-12px_rgba(14,18,27,0.10)]",
-        "data-[state=open]:animate-slideIn",
+        "data-[state=open]:animate-slideIn data-[state=closed]:animate-hide",
     ),
     {
         variants: {

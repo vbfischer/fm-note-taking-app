@@ -24,12 +24,12 @@ export const Navigation = async ({ className, ...props }: React.ComponentPropsWi
         } {...props}>
             <NoteLogo />
             <div className="flex flex-col">
-                <NavItem selected><IconHome /> All Notes</NavItem>
-                <NavItem><IconArchive /> Archived Notes</NavItem>
+                <NavItem href="/notes" selected><IconHome /> All Notes</NavItem>
+                <NavItem href="/notes/archived"><IconArchive /> Archived Notes</NavItem>
                 <Separator className="my-[8px]" />
                 <Text className="text-neutral-500 my-[8px]">Tags</Text>
                 {tags.map(t => (
-                    <NavItem key={t.id}><IconTag />{t.name}</NavItem>
+                    <NavItem href={`/notes/tagged/${t.id}`} key={t.id}><IconTag />{t.name}</NavItem>
 
                 ))}
             </div>
